@@ -1,6 +1,18 @@
 # cotary
 Cotary allows you to prove that you have a document without releasing it.
 
+# Motivation
+The following scenario describes the motivation for this simple tool:
+Alice as an idea that she wants to use; either by publishing it in an article or paper or using it in a product. But she needs help; so she asks Bob to collaborate with her. Alice's idea is so good, though, that she is afraid that Bob will steal the idea from her and not involve her.
+
+To counter this, she needs proof that she had the idea first; but without releasing the idea to the public yet. So she writes a simple draft of her ideas including all important ingredients, calculates a cryptographic hash `H(d)` of this document `d` and stores the document it in a safe place. Before talking to Bob, she publishes the hash. Since `H` is one-way, her ideas are still safe.
+
+In case Bob tries to use Alice's ideas without her approval, she can at a later stage release the document `d` to the world. Since everyone can check that her previously published hash `H(d)` belongs to the document, she now proved that she had the ideas in the document before talking to Bob.
+
+_Cotary_ (code notary) makes this process for Alice very easy. Simply execute `cotary` on a file and it will publish a cryptographically secure hash on your Twitter account. This tweet with a timestamp and the hash proves you had the file at time of publishing.
+
+This shows a _very_ simple use case of hash functions and how to use them in practice.
+
 # Installation
 Make sure you have the python requirements installed given in `requirements.txt`.
 
