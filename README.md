@@ -18,7 +18,7 @@ Make sure you have the python requirements installed given in `requirements.txt`
 
 This can be achieved using pip (omit `--user` to install it system-wide).
 ```
-$ pip install --user -r reqirements.txt
+$ pip install --user -r requirements.txt
 ```
 
 Then make `./cotary` executable and execute it:
