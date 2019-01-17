@@ -19,7 +19,7 @@ Publish a given checksum to Twitter.
 import twitter
 from twitter.error import TwitterError
 
-import checksum
+import cotary.checksum
 
 class PublisherError(Exception):
     pass
@@ -62,11 +62,11 @@ class Publisher(object):
             raise PublisherError("{} is not a checksum".format(cs))
 
 if __name__=="__main__":
-    import config
-    config = Config.Config()
+    import cotary.config
+    config = cotary.config.Config()
 
     content = b"Hello World!"
-    checksum = checksum.Checksum([content])
+    checksum = cotary.checksum.Checksum([content])
 
     publisher = Publisher(config)
     status = publisher.publish(checksum)

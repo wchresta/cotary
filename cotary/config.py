@@ -19,18 +19,26 @@ import yaml
 
 from yaml import YAMLError
 
+
+DEFAULT_CONFIG="""
+twitter:
+    message: 'I own a file with checksum {checksum} (cotary)'
+    # The following are twitter API keys. Get them from https://dev.twitter.com/apps
+    consumer:
+        key: null
+        secret: null
+    access_token:
+        key: null
+        secret: null
+"""
+
 class Config(dict):
     """Load and manage loading configuration files over a default set of config"""
 
     @staticmethod
     def default_config():
         """Return a dict which contains the default configuration"""
-        return copy.deepcopy(
-            { 'twitter': { 'message': 'I own a file with checksum {checksum} (cotary)'
-                         , 'consumer': { 'key': None, 'secret': None }
-                         , 'access_token': { 'key': None, 'secret': None }
-                         }
-            })
+        return yaml.load(DEFAULT_CONFIG)
 
     def __init__(self, config_path):
         """

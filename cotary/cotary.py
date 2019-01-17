@@ -19,79 +19,99 @@ import argparse
 import sys # for stdin and stderr
 import os # for path manipulation
 
-import config
-import checksum
-import publisher
+import cotary.config
+import cotary.checksum
+import cotary.publisher
+# Parse arguments
 
-copyright_notice="""
+
+_copyright_notice="""
 Copyright (C) 2019 Wanja Chresta
 This program comes with ABSOLUTELY NO WARRANTY
 This is free software, and you are welcome to redistribute it
 under certain conditions. See the LICENCE file for more information.
 """
 
-# Constants
-default_config = os.path.expanduser("~/.config/cotary/config.yaml")
+_default_config=os.path.join(os.path.expanduser("~"),'.config','cotary','config.yaml')
 
-# Parse arguments
 def parse_arguments():
+    # Constants
     parser = argparse.ArgumentParser(
             description='Publish the checksum of a file on Twitter.',
-            epilog=copyright_notice)
+            epilog=_copyright_notice)
 
     # We use sys.stdin.buffer to make sure we read in binary mode
     parser.add_argument('file', type=str, nargs='?', default='--',
             help='File for which to publish checksum. If none is given, read from stdin')
     parser.add_argument('-c','--calc_only', action='store_true',
             help='Only calculate and print the checksum, do not publish it')
-    parser.add_argument('--config', nargs='?', default=default_config,
+    parser.add_argument('--config', nargs='?', default=_default_config,
             help='Use given config instead of ~/.local/cotary/config.yaml')
     parser.add_argument('-q','--quiet', action='store_true',
             help='Do not print any messages')
 
     return parser.parse_args()
 
-def main():
-    args = parse_arguments()
-    conf = config.Config(args.config) # Read config
 
-    def echo(*strs, **kwargs):
-        if not args.quiet:
-            print(*strs, **kwargs)
+def echo(args, *strs, **kwargs):
+    if not args.quiet:
+        print(*strs, **kwargs)
 
-    def error(errno, *strs):
-        echo(*strs, file=sys.stderr)
-        sys.exit(errno)
 
+def error(args, errno, *strs):
+    echo(args, *strs, file=sys.stderr)
+    sys.exit(errno)
+
+
+def get_config(args):
+    """Read configuration. If there is no config file, create one"""
+    
+    # Do we need to create a new config file?
+    # Only create one, if the config path was not changed
+    if args.config == _default_config:
+        # Check if it exists
+        if not os.path.exists(_default_config):
+            # Create the config file and dump the default config
+            try:
+                os.makedirs(os.path.dirname(_default_config), exist_ok=True)
+                fh = open(_default_config, 'w')
+                fh.write(cotary.config.DEFAULT_CONFIG)
+                fh.close()
+            except (PermissionError):
+                pass
+
+    return cotary.config.Config(args.config) # Read config
+
+
+def get_filehandler(args):
     if args.file == '--': # Read from stdin
-        echo("Reading from stdin.")
-        fh = sys.stdin.buffer # .buffer to make sure we read raw
+        echo(args, "Reading from stdin.")
+        return sys.stdin.buffer # .buffer to make sure we read raw
     else: # Is a path
         try:
-            fh = open(args.file,'rb') # Read binary
+            return open(args.file,'rb') # Read binary
         except FileNotFoundError as e:
-            error(1, e.strerror, file=sys.stderr)
+            error(args, 1, e.strerror, file=sys.stderr)
 
-    # Calculate checksum
+
+def calc_checksum(args, fh):
     try:
-        cs = checksum.Checksum(fh)
+        return cotary.checksum.Checksum(fh)
     except ValueError:
-        error(2, "Input is empty. Aborting.")
+        error(args, 2, "Input is empty. Aborting.")
     except KeyboardInterrupt:
-        error(3, "Aborted by the user.")
+        error(args, 3, "Aborted by the user.")
 
-    echo("checksum: {}".format(cs))
 
-    if args.calc_only:
-        sys.exit(0) # Success
-
-    publ = publisher.Publisher(conf)
-    if not publ.is_configured():
-        error(4, "Config file is not set up correctly.")
+def publish_checksum(args, config, checksum):
+    publisher = cotary.publisher.Publisher(config)
+    if not publisher.is_configured():
+        error(args, 4, "Config file {} is not set up correctly.".format(args.config))
 
     try:
-        status = publ.publish(cs)
+        return publisher.publish(cs)
     except publisher.TwitterError as e:
+        # Something went wrong; try to give a somewhat good error message
         try:
             errno = e.message[0]["code"]
             errmsg = e.message[0]["message"]
@@ -102,7 +122,24 @@ def main():
         if errno == 187: # Status is a duplicate.
             errmsg = "This checksum was already published."
 
-        error(errno, errmsg)
+        error(args, errno, errmsg)
+
+
+def main():
+    args = parse_arguments()
+    config = get_config(args)
+
+    fh = get_filehandler(args)
+
+    # Calculate checksum
+    checksum = calc_checksum(args, fh)
+    echo(args, "checksum: {}".format(checksum))
+
+    if args.calc_only: # User does not want to publish checksum
+        sys.exit(0) # Success
+
+    # Publish checksum and get the published twitter status back
+    status = publish_checksum(args, config, checksum)
 
     if not args.quiet:
         import datetime

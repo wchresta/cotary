@@ -1,2 +1,0 @@
-python-twitter>=3.0
-pyyaml>=3.0

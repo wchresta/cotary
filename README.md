@@ -14,18 +14,23 @@ _Cotary_ (code notary) makes this process for Alice very easy. Simply execute `c
 This shows a _very_ simple use case of hash functions and how to use them in practice.
 
 # Installation
-Make sure you have the python requirements installed given in `requirements.txt`.
+## Installation from PyPI
+cotary is [available on PyPI](https://pypi.org/project/cotary/) so installation is very easy using pip:
+```
+pip install --user cotary
+```
+Omit `--user` to install it system-wide.
 
-This can be achieved using pip (omit `--user` to install it system-wide).
-```
-$ pip install --user -r requirements.txt
-```
+Now, the `cotary` executable should be in your PATH and ready to use.
 
-Then make `./cotary` executable and execute it:
+## Installation from source
+Pip can be used to install from source, as well. The `setup.py` file contains everything pip needs to know, so you can install your local copy of the source easily with:
 ```
-$ chmod +x cotary
-$ ./cotary -h
+$ pip install --user .
 ```
+Omit `--user` to install it system-wide.
+
+Now, the `cotary` executable should be in your PATH and ready to use.
 
 # Configuration
 Configuration of Twitter APIs is done using a yaml config file.
@@ -33,14 +38,14 @@ At the moment, these are the options. Default config file is in `~/.config/cotar
 
 ```yaml
 twitter:
-    message: 
-        'I own a file with checksum {checksum} (cotary)'
+    message: 'I own a file with checksum {checksum} (cotary)'
+    # The following are twitter API keys. Get them from https://dev.twitter.com/apps
     consumer:
-        key: xyz
-        secret: abcd
+        key: null
+        secret: null
     access_token:
-        key: 123
-        secret: 7890
+        key: null
+        secret: null
 ```
 
 # Usage
