@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="cotary",
-    version="0.1",
+    version="0.1.1",
 
     author="Wanja Chresta",
     author_email="wanja.hs@chrummibei.ch",

@@ -14,19 +14,25 @@ _Cotary_ (code notary) makes this process for Alice very easy. Simply execute `c
 This shows a _very_ simple use case of hash functions and how to use them in practice.
 
 # Installation
+cotary currently only support python3. python2 is not supported. Thus, make sure you use `pip` for your python3 environment; sometime it is called `pip3`. On some systems, the python3 executable is called `python3` instead of `python`. In those cases, you can use `python3 -m pip` instead of just calling `pip` to make sure you have the right version.
+
 ## Installation from PyPI
 cotary is [available on PyPI](https://pypi.org/project/cotary/) so installation is very easy using pip:
+
+Make sure you have [pip installed](https://pip.pypa.io/en/stable/installing/) for your python3 environment.
 ```
-pip install --user cotary
+$ python3 -m pip install --user cotary
 ```
 Omit `--user` to install it system-wide.
 
 Now, the `cotary` executable should be in your PATH and ready to use.
 
 ## Installation from source
-Pip can be used to install from source, as well. The `setup.py` file contains everything pip needs to know, so you can install your local copy of the source easily with:
+Pip can be used to install from source, as well. The `setup.py` file contains everything pip needs to know, so you can install your local copy of the source easily:
+
+Make sure you have [pip installed](https://pip.pypa.io/en/stable/installing/) for your python3 environment.
 ```
-$ pip install --user .
+$ python3 -m pip install --user .
 ```
 Omit `--user` to install it system-wide.
 
@@ -50,7 +56,7 @@ twitter:
 
 # Usage
 ```
-usage: cotary.py [-h] [-c] [--config [CONFIG]] [-q] [file]
+usage: cotary [-h] [-c] [--config [CONFIG]] [-q] [file]
 
 Publish the checksum of a file on Twitter.
 
@@ -68,7 +74,7 @@ optional arguments:
 # Example
 
 ```
-$ ./cotary README.md 
+$ cotary README.md 
 checksum: openssl_sha256:66ca5ae6f1f3760ad7258cc1d1e906ec8853a0e4da2b2de42f55036cffe8f8a2
 Status published at 2019-01-16 15:18:38
 ```
